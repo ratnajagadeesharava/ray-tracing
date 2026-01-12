@@ -4,6 +4,8 @@ mod vec3;
 use vec3::{Color, Point3, Vec3};
 mod ray;
 use ray::Ray;
+mod hittable;
+use hittable::Hittable
 const ASPECT_RATIO: f64 = 1.7778;
 
 fn write_color(color: &Color) -> String {
