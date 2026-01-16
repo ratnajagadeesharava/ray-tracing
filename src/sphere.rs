@@ -1,0 +1,36 @@
+use crate::dot;
+use crate::vec3::{Vec3,Point3};
+use crate::hittable::{Hittable,Hit_Record};
+use crate::ray::{Ray};
+pub struct Sphere{
+    pub radius:f64,
+    pub center:Point3
+}
+
+impl Hittable for Sphere {
+    fn hit(&self,ray:Ray,t_min:f64,t_max:f64,mut hit_record:&mut Hit_Record)->bool {
+        let oc =&self.center- &(ray.o);
+        let dir = ray.dir;
+        let a = dot(&dir,&dir);
+        let b = -2.0*dot(&dir,&oc);
+        let c = dot(&oc,&oc)-self.radius*self.radius;
+        let discriminant = b*b-4.0*a*c;
+        if discriminant <0.0{
+            return false;
+        }
+        let sqrtd = discriminant.sqrt();
+        let mut root = (-b-sqrtd)/(2.0*a);
+        if root<=t_min ||root>= t_max{
+            root = (-b+sqrtd)/(2.0*a);
+            if root<=t_min ||root>= t_max{
+                return false;
+            }
+        }
+        let point = ray.at(root);
+        let normal  = &point-&self.center;
+        hit_record.point = point;
+        hit_record.normal = normal.normalize();
+        hit_record.t = root;
+        true
+    }
+}
