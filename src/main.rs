@@ -5,7 +5,11 @@ use vec3::{Color, Point3, Vec3};
 mod ray;
 use ray::Ray;
 mod hittable;
-use hittable::Hittable
+use hittable::Hittable;
+mod sphere;
+use sphere::Sphere;
+
+use crate::hittable::Hit_Record;
 const ASPECT_RATIO: f64 = 1.7778;
 
 fn write_color(color: &Color) -> String {
@@ -22,33 +26,20 @@ fn dot(v1:&Vec3,v2:&Vec3)->f64{
     v1.x()*v2.x()+v1.y()*v2.y()+v1.z()*v2.z()
 }
 
-fn hit_sphere(ray:&Ray,center:Point3,radius:f64)->f64{
-    let oc =&center- &(ray.o);
-    let dir = ray.dir;
-    let a = dot(&dir,&dir);
-    let b = -2.0*dot(&dir,&oc);
-    let c = dot(&oc,&oc)-radius*radius;
-    let discriminant = b*b-4.0*a*c;
-    if discriminant < 0.0{
-        -1.0
-    }
-    else {
-        (-1.0*b-discriminant.sqrt())/(2.0*a)
-    }
-
-}
-
-fn ray_color(ray: &Ray) -> Color {
+fn ray_color(ray: Ray) -> Color {
     let white = Color::new(1.0, 1.0, 1.0);
     let blue = Color::new(0.5, 0.7, 1.0);
     let a = 0.5 * (ray.dir.y() + 1.0);
     let sphere_center = Point3::new(0.0,0.0,-1.0);
-    let t = hit_sphere(ray, sphere_center, 0.5);
-    if t!=-1.0{
-        // println!("{t}");
-        let  p = ray.at(t);
-        let normal = (&p-&sphere_center).normalize();
-        &(normal+Vec3::new(1.0,1.0,1.0))*0.5
+    let sphere = Sphere{
+        radius:0.5,
+        center:sphere_center
+    };
+    let unit_vector  =Vec3::new(1.0,1.0,1.0);
+    let mut hit_record:Hit_Record = Hit_Record { point: unit_vector, normal: unit_vector, t: 0.0 };
+    if sphere.hit(ray, 0.0, 5.0, &mut hit_record){
+        let color = &(&hit_record.normal +&unit_vector)*0.5;
+        color
     }
     else{
         white * (1.0 - a) + blue * a
@@ -81,7 +72,7 @@ fn main() {
             let pixel_position = &pixel_distance + &up_left_pixel;
             let pixel_direction = &pixel_position - &camera_center;
             let ray = Ray::new(camera_center, pixel_direction);
-            let pixel_color = ray_color(&ray);
+            let pixel_color = ray_color(ray);
             content.push_str(&write_color(&pixel_color));
         }
     }
