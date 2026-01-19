@@ -1,6 +1,6 @@
 use crate::dot;
-use crate::vec3::{Vec3,Point3};
-use crate::hittable::{Hittable,Hit_Record};
+use crate::vec3::{Point3};
+use crate::hittable::{Hittable,HitRecord};
 use crate::ray::{Ray};
 pub struct Sphere{
     pub radius:f64,
@@ -8,7 +8,7 @@ pub struct Sphere{
 }
 
 impl Hittable for Sphere {
-    fn hit(&self,ray:Ray,t_min:f64,t_max:f64,mut hit_record:&mut Hit_Record)->bool {
+    fn hit(&self,ray:Ray,t_min:f64,t_max:f64,hit_record:&mut HitRecord)->bool {
         let oc =&self.center- &(ray.o);
         let dir = ray.dir;
         let a = dot(&dir,&dir);
