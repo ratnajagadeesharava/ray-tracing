@@ -8,7 +8,8 @@ mod hittable;
 use hittable::Hittable;
 mod sphere;
 use sphere::Sphere;
-
+mod hittable_list;
+use crate::hittable_list::HittableList;
 use crate::hittable::HitRecord;
 const ASPECT_RATIO: f64 = 1.7778;
 
