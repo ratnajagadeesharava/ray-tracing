@@ -8,8 +8,9 @@ mod hittable;
 use hittable::Hittable;
 mod sphere;
 use sphere::Sphere;
-
-use crate::hittable::Hit_Record;
+mod hittable_list;
+use crate::hittable_list::HittableList;
+use crate::hittable::HitRecord;
 const ASPECT_RATIO: f64 = 1.7778;
 
 fn write_color(color: &Color) -> String {
@@ -22,33 +23,36 @@ fn write_color(color: &Color) -> String {
     format!("{} {} {} \n ", &ir, &ig, &ib)
 }
 
-fn dot(v1:&Vec3,v2:&Vec3)->f64{
-    v1.x()*v2.x()+v1.y()*v2.y()+v1.z()*v2.z()
+fn dot(v1: &Vec3, v2: &Vec3) -> f64 {
+    v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z()
 }
 
 fn ray_color(ray: Ray) -> Color {
     let white = Color::new(1.0, 1.0, 1.0);
     let blue = Color::new(0.5, 0.7, 1.0);
     let a = 0.5 * (ray.dir.y() + 1.0);
-    let sphere_center = Point3::new(0.0,0.0,-1.0);
-    let sphere = Sphere{
-        radius:0.5,
-        center:sphere_center
+    let sphere_center = Point3::new(0.0, 0.0, -1.0);
+    let sphere = Sphere {
+        radius: 0.5,
+        center: sphere_center,
     };
-    let unit_vector  =Vec3::new(1.0,1.0,1.0);
-    let mut hit_record:Hit_Record = Hit_Record { point: unit_vector, normal: unit_vector, t: 0.0 };
-    if sphere.hit(ray, 0.0, 5.0, &mut hit_record){
-        let color = &(&hit_record.normal +&unit_vector)*0.5;
+    let unit_vector = Vec3::new(1.0, 1.0, 1.0);
+    let mut hit_record: HitRecord = HitRecord {
+        point: unit_vector,
+        normal: unit_vector,
+        t: 0.0,
+        front_face: false,
+    };
+    if sphere.hit(ray, 0.0, 5.0, &mut hit_record) {
+        let color = &(&hit_record.normal + &unit_vector) * 0.5;
         color
-    }
-    else{
+    } else {
         white * (1.0 - a) + blue * a
     }
 }
 
-
 fn main() {
-     let mut file = File::create("image.ppm").unwrap();
+    let mut file = File::create("image.ppm").unwrap();
     let mut content: String = String::from("P3\n");
     let image_height: i64 = 1080;
     let image_width: i64 = ((image_height as f64) * ASPECT_RATIO) as i64;
@@ -62,8 +66,10 @@ fn main() {
     let pixel_delta_v = &viewport_v / image_height as f64;
     let s = format!("{} {}", &image_width, &image_height);
     let view_port_center_from_top: Vec3 = (&viewport_u + &viewport_v) * 0.5;
-    let view_port_upper_left =&(&camera_center - &Vec3::new(0.0, 0.0, focal_length)) - &view_port_center_from_top;
-    let up_left_pixel = &(&view_port_upper_left + &(&pixel_delta_u * 0.5)) + &(&pixel_delta_v * 0.5);
+    let view_port_upper_left =
+        &(&camera_center - &Vec3::new(0.0, 0.0, focal_length)) - &view_port_center_from_top;
+    let up_left_pixel =
+        &(&view_port_upper_left + &(&pixel_delta_u * 0.5)) + &(&pixel_delta_v * 0.5);
     content.push_str(&s);
     content.push_str("\n255\n");
     for i in 0..image_height {
