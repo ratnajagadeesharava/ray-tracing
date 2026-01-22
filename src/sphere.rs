@@ -30,6 +30,7 @@ impl Hittable for Sphere {
         let normal  = &point-&self.center;
         hit_record.point = point;
         hit_record.normal = normal.normalize();
+        hit_record.set_face_normal(ray, normal.normalize());
         hit_record.t = root;
         true
     }
