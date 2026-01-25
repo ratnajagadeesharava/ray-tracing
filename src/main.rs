@@ -10,7 +10,7 @@ use crate::hittable_list::HittableList;
 mod camera;
 use crate::camera::Camera;
 
-
+mod utility;
 
 
 fn main() {
