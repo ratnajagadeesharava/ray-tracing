@@ -41,6 +41,6 @@ fn test_random(){
 
 #[test]
 fn test_random_range(){
-    let val= float_random_value_in_range(4.0,8.0, );
+    let val= float_random_value_in_range(-8.0,8.0, );
     println!("random varaible in the rang 4.0 to 8.0 {val}")
 }

@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{rc::Rc, time::Instant};
 mod vec3;
 use vec3::{ Point3, Vec3};
 mod ray;
@@ -9,12 +9,11 @@ mod hittable_list;
 use crate::hittable_list::HittableList;
 mod camera;
 use crate::camera::Camera;
-
 mod utility;
 
 
 fn main() {
-   
+   let start_timer = Instant::now();
     let camera: Camera = Camera::new(1080, 1.0, 2.0, Point3::new(0.0, 0.0, 0.0));
 
     //world
@@ -25,4 +24,8 @@ fn main() {
     world.add(Rc::new(sphere2));
 
     camera.render(world);
+
+    let duration = start_timer.elapsed();
+
+    println!("total rendering time {:?}",duration);
 }

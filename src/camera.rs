@@ -11,7 +11,7 @@ const BLUE: Vec3 = Vec3 { e: (0.5, 0.7, 1.0) };
 const T_MAX: f64 = f64::MAX;
 const SAMPLES_PER_PIXEL:i32 = 10;
 const PIXEL_SAMPLE_SCALE:f64 = 1.0 / SAMPLES_PER_PIXEL as f64;
-
+const MAX_DEPTH:i32  =2;
 pub struct Camera {
     pub image_height: i64,
     image_width: i64,
@@ -60,7 +60,7 @@ impl Camera {
                 let mut pixel_color:Color = Vec3 { e: (0.0,0.0,0.0) };
                 for _ in 1..SAMPLES_PER_PIXEL{
                     let ray: Ray = self.get_ray(i, j);
-                    pixel_color = &pixel_color + &Camera::ray_color(ray, world.clone());
+                    pixel_color = &pixel_color + &Camera::ray_color(ray,MAX_DEPTH, world.clone());
                 }
                 content.push_str(&write_color(&pixel_color * PIXEL_SAMPLE_SCALE));
             }
@@ -85,13 +85,19 @@ impl Camera {
         ray
     }
 
-    fn ray_color(ray: Ray, world: HittableList) -> Color {
+    fn ray_color(ray: Ray,depth:i32, world: HittableList) -> Color {
+        if depth <= 0{
+            return Color{e:(0.0,0.0,0.0)};
+        }
         let mut hit_record: HitRecord = HitRecord::default();
         let unit: Vec3 = Vec3::new(1.0, 1.0, 1.0);
         let unit_direction: Vec3 = ray.dir.normalize();
         let a: f64 = 0.5 * (unit_direction.y() + 1.0);
         if world.hit(ray, 0.001, T_MAX, &mut hit_record) {
-            (hit_record.normal + unit) * 0.5
+            let direction = Vec3::random_unit_vector(hit_record.normal);
+            let r = Ray::new(hit_record.point, direction);
+            &Self::ray_color(r,depth-1,world)*0.5
+            //  (direction + unit) * 0.5
         } else {
             WHITE * (1.0 - a) + BLUE * a
         }
