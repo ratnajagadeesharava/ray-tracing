@@ -1,5 +1,7 @@
 use std::ops::{Add, Div, Mul, Sub};
 
+use crate::utility::{float_random_value, float_random_value_in_range};
+
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Vec3 {
     pub e: (f64, f64, f64),
@@ -33,6 +35,35 @@ impl Vec3 {
     }
     pub fn z(&self) -> f64 {
         self.e.2
+    }
+
+    pub fn random() -> Vec3 {
+        Vec3 {
+            e: (
+                float_random_value(),
+                float_random_value(),
+                float_random_value(),
+            ),
+        }
+    }
+
+    pub fn random_in_range(min: f64, max: f64) -> Vec3 {
+        Vec3 {
+            e: (
+                float_random_value_in_range(min, max),
+                float_random_value_in_range(min, max),
+                float_random_value_in_range(min, max),
+            ),
+        }
+    }
+
+    pub fn random_unit_vector(normal: Vec3) -> Vec3 {
+        let random_vector = Vec3::random_in_range(-1.0, 1.0);
+        if Vec3::dot(&random_vector, &normal) > 0.0 {
+            return random_vector.normalize();
+        } else {
+            return random_vector.normalize() * -1.0;
+        }
     }
 }
 

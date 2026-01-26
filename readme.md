@@ -27,5 +27,5 @@ the image plane is 2 units wide and 1 unit tall
 - ray class is used to represent a ray. It has the following methods:
 		point_at_parameter: returns the point at a given distance along the ray
 
-
+total rendering time 28.4331374s
 # todo:
